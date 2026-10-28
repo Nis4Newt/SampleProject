@@ -1,0 +1,14 @@
+root = true
+
+[*.cs]
+# 중괄호: 클래스/인터페이스/함수 선언은 올맨, 함수 내부(제어문 등)는 K&R
+csharp_new_line_before_open_brace = types, methods, properties, accessors, events, indexers
+csharp_new_line_before_else = false
+csharp_new_line_before_catch = false
+csharp_new_line_before_finally = false
+
+# 한 줄짜리 제어문에도 항상 중괄호 사용
+csharp_prefer_braces = true:warning
+
+# 접근 제한자 항상 명시
+dotnet_style_require_accessibility_modifiers = always:warning
