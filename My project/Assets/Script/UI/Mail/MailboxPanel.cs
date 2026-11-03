@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MailboxPanel : BasePanel
+public class MailboxPanel : ModelPanel<MailboxModel>
 {
     [Header("Tabs")]
     [SerializeField] private TabButton _mailButton;
@@ -14,13 +14,18 @@ public class MailboxPanel : BasePanel
     [SerializeField] private MailSlot _mailSlotPrefab;
 
     private readonly List<MailSlot> _slots = new List<MailSlot>();
-    private readonly List<MailProtocol> _mails = new List<MailProtocol>();
-    private readonly List<MailProtocol> _parcels = new List<MailProtocol>();
 
     private MailSlotType _currentTab = MailSlotType.Mail;
 
-    private void OnDestroy()
+    protected override void OnBound()
     {
+        Model.Changed += Refresh;
+    }
+
+    protected override void OnUnbound()
+    {
+        Model.Changed -= Refresh;
+
         _slots.ForEach(slot => slot.Clicked -= OnSlotClicked);
     }
 
@@ -31,67 +36,37 @@ public class MailboxPanel : BasePanel
         AddListener(_mailButton, ShowMails);
         AddListener(_parcelButton, ShowParcels);
 
-        Refresh();
-    }
-
-    public void OnMailProtocol(MailProtocol protocol)
-    {
-        switch (protocol.Type) {
-            case MailSlotType.Mail:
-                AddMail(protocol.Content);
-                break;
-            case MailSlotType.Parcel:
-                AddParcel(protocol.Content, protocol.ItemType);
-                break;
-        }
-    }
-
-    public void AddMail(string mailContent)
-    {
-        _mails.Add(new MailProtocol(MailSlotType.Mail, mailContent));
-        RefreshIfShowing(MailSlotType.Mail);
-    }
-
-    public void AddParcel(string parcelContent, ParcelItem itemType)
-    {
-        if (!IsValidParcelItem(itemType)) {
-            Debug.LogWarning($"MailboxPanel.AddParcel: 잘못된 택배 아이템({itemType})이라 무시합니다.");
-            return;
-        }
-
-        _parcels.Add(new MailProtocol(MailSlotType.Parcel, parcelContent, itemType));
-        RefreshIfShowing(MailSlotType.Parcel);
+        RefreshSlots();
+        RefreshFlagNotify();
     }
 
     public void ShowMails()
     {
         _currentTab = MailSlotType.Mail;
-        Refresh();
+        RefreshSlots();
         ResetScroll();
     }
 
     public void ShowParcels()
     {
         _currentTab = MailSlotType.Parcel;
-        Refresh();
+        RefreshSlots();
         ResetScroll();
     }
 
-    private static bool IsValidParcelItem(ParcelItem itemType)
+    private void Refresh(NotifyKey key, bool isOn)
     {
-        return itemType != ParcelItem.None && (itemType & ~ParcelItem.Both) == 0;
-    }
-
-    private void RefreshIfShowing(MailSlotType type)
-    {
-        if (isActiveAndEnabled && _currentTab == type) {
-            Refresh();
+        if (key.Contents != ContentsType.Mail) {
+            return;
         }
+
+        RefreshSlots();
+        RefreshFlagNotify();
     }
 
-    private void Refresh()
+    private void RefreshSlots()
     {
-        List<MailProtocol> items = _currentTab == MailSlotType.Mail ? _mails : _parcels;
+        List<MailProtocol> items = Model.GetNewItems(_currentTab);
 
         EnsureSlotCount(items.Count);
 
@@ -115,6 +90,12 @@ public class MailboxPanel : BasePanel
         LayoutRebuilder.ForceRebuildLayoutImmediate(_content);
     }
 
+    private void RefreshFlagNotify()
+    {
+        _mailButton.SetNotify(Model.HasNewFlag(MailSlotType.Mail));
+        _parcelButton.SetNotify(Model.HasNewFlag(MailSlotType.Parcel));
+    }
+
     private void EnsureSlotCount(int count)
     {
         while (_slots.Count < count) {
@@ -126,15 +107,15 @@ public class MailboxPanel : BasePanel
 
     private void OnSlotClicked(MailSlot slot)
     {
-        List<MailProtocol> items = _currentTab == MailSlotType.Mail ? _mails : _parcels;
+        List<MailProtocol> items = Model.GetNewItems(_currentTab);
         int index = _slots.IndexOf(slot);
 
         if (index < 0 || index >= items.Count) {
             return;
         }
 
-        items.RemoveAt(index);
-        Refresh();
+        Model.RemoveItem(_currentTab, index);
+        RefreshSlots();
     }
 
     private void ResetScroll()
