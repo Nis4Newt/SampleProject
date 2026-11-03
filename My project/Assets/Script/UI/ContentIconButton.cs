@@ -9,6 +9,7 @@ public class ContentIconButton : MonoBehaviour
     [SerializeField] private GameObject _noti;
 
     private Button _button;
+    private bool _isNotifyOn = false;
 
     public ContentsType Type => _type;
     public Button Button
@@ -26,6 +27,12 @@ public class ContentIconButton : MonoBehaviour
 
     private void Awake()
     {
-        _noti.SetActive(false);
+        _noti.SetActive(_isNotifyOn);
+    }
+
+    public void SetNotify(bool isOn)
+    {
+        _isNotifyOn = isOn;
+        _noti.SetActive(isOn);
     }
 }

@@ -49,6 +49,11 @@ public class ExpansionButton : MonoBehaviour, IPointerClickHandler
         _onClicked -= listener;
     }
 
+    public void SetNotify(bool isOn)
+    {
+        _noti.SetActive(isOn);
+    }
+
     private void Refresh()
     {
         if (_image != null) {

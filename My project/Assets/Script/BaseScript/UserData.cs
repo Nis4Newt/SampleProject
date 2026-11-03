@@ -1,16 +1,17 @@
-using System;
-using UnityEngine;
-
-[Serializable]
 public class UserData
 {
-    [Header("Level")]
-    [SerializeField] private int _level = 1;
+    private int _level = 1;
 
     public int Level => _level;
 
-    public void SetLevel(int value)
+    // 레벨은 올라가기만 한다. 올랐을 때만 true
+    public bool TrySetLevel(int value)
     {
-        _level = Mathf.Max(1, value);
+        if (value <= _level) {
+            return false;
+        }
+
+        _level = value;
+        return true;
     }
 }
