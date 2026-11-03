@@ -285,10 +285,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a2613a3a5573c54ab9bcff59032a484, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MailSlot
-  button: {fileID: 3820411682876297486}
-  contentText: {fileID: 3677637059480533087}
-  firstItem: {fileID: 3599787735446841180}
-  secondItem: {fileID: 1402673112795075464}
+  _button: {fileID: 3820411682876297486}
+  _contentText: {fileID: 3677637059480533087}
+  _firstItem: {fileID: 3599787735446841180}
+  _secondItem: {fileID: 1402673112795075464}
 --- !u!1 &4536035290206574677
 GameObject:
   m_ObjectHideFlags: 0

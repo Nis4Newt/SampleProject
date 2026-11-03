@@ -122,8 +122,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
-  text: {fileID: 2151253857176472141}
-  noti: {fileID: 2875745205247552078}
+  _text: {fileID: 2151253857176472141}
+  _noti: {fileID: 2875745205247552078}
 --- !u!1 &2875745205247552078
 GameObject:
   m_ObjectHideFlags: 0
